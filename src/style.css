@@ -1,0 +1,372 @@
+/* Terminal look of the Sendspin CLI (rich panels): dark navy screen, rounded
+   panels with a centered title, monospace everywhere. */
+
+:root {
+  --bg: #0b1a28;
+  --fg: #e6edf3;
+  --dim: #8b98a6;
+  --teal: #3ed6b5;
+  --green: #4ade80;
+  --red: #ff6b6b;
+  --blue: #7aa7f0;
+  --magenta: #c792ea;
+  --yellow: #e5d27a;
+  --cyan: #6fd3e0;
+  --key: #dfe7ef;
+  --focus: #ffffff;
+  --radius: 10px;
+  --gap: 14px;
+  color-scheme: dark;
+  font-family: "JetBrains Mono", "Fira Code", "DejaVu Sans Mono", ui-monospace, Menlo, Consolas,
+    "Liberation Mono", monospace;
+  font-size: 16px;
+  line-height: 1.45;
+  /* terminal text: no programming ligatures (they merge ---- and => into lines/arrows) */
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "calt" 0;
+  -webkit-text-size-adjust: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+body {
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+    max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  overscroll-behavior: none;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.screen {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ---------- layout ---------- */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-areas:
+    "now now vol"
+    "prog prog prog"
+    "play stream server"
+    "foot foot foot";
+  gap: var(--gap);
+}
+
+.now-playing {
+  grid-area: now;
+}
+.volume {
+  grid-area: vol;
+}
+.progress {
+  grid-area: prog;
+}
+.playback {
+  grid-area: play;
+}
+.stream {
+  grid-area: stream;
+}
+.server {
+  grid-area: server;
+}
+.footer {
+  grid-area: foot;
+  margin: 0;
+  text-align: right;
+}
+
+@media (max-width: 760px) {
+  :root {
+    --gap: 12px;
+    font-size: 15px;
+  }
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "now" "prog" "vol" "play" "stream" "server" "foot";
+  }
+}
+
+.center {
+  min-height: calc(100dvh - 32px);
+  display: grid;
+  place-items: center;
+}
+
+/* ---------- panels ---------- */
+
+.panel {
+  margin: 0;
+  min-width: 0;
+  padding: 6px 16px 12px;
+  border: 1.5px solid var(--accent);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+}
+
+.panel > legend {
+  margin: 0 auto;
+  padding: 0 0.6ch;
+  color: var(--accent);
+}
+
+.blue {
+  --accent: var(--blue);
+}
+.magenta {
+  --accent: var(--magenta);
+}
+.green {
+  --accent: var(--green);
+}
+.yellow {
+  --accent: var(--yellow);
+}
+.cyan {
+  --accent: var(--cyan);
+}
+
+.dialog {
+  width: min(560px, 100%);
+}
+
+/* ---------- key/value rows ---------- */
+
+.kv {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  column-gap: 2ch;
+  margin: 0 0 12px;
+}
+
+.kv dt {
+  color: var(--dim);
+}
+
+.kv dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.strong {
+  font-weight: 700;
+}
+.teal {
+  color: var(--teal);
+}
+.dim {
+  color: var(--dim);
+}
+.ok {
+  color: var(--green);
+  font-weight: 700;
+}
+.warn {
+  color: var(--yellow);
+  font-weight: 700;
+}
+.err {
+  color: var(--red);
+  font-weight: 700;
+}
+
+/* ---------- key hints (tappable) ---------- */
+
+.hints {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 1.5ch;
+  row-gap: 4px;
+  color: var(--dim);
+}
+
+.hints + .hints {
+  margin-top: 2px;
+}
+
+.hints.bottom {
+  margin-top: auto;
+}
+
+.hints .sep {
+  margin: 0 -1.2ch;
+}
+
+button {
+  font: inherit;
+  color: var(--dim);
+  background: none;
+  border: 0;
+  padding: 4px 2px;
+  margin: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 32px;
+}
+
+button:hover {
+  color: var(--fg);
+}
+
+button:active,
+button.flash {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+button:focus-visible,
+input:focus-visible,
+.menu li:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+kbd {
+  font: inherit;
+  font-weight: 700;
+  color: var(--key);
+}
+
+@media (pointer: coarse) {
+  button {
+    min-height: 40px;
+    padding: 6px 4px;
+  }
+}
+
+.primary {
+  color: var(--fg);
+  border: 1.5px solid var(--accent);
+  padding: 6px 14px;
+}
+
+/* ---------- progress ---------- */
+
+.progress-row {
+  display: flex;
+  align-items: center;
+  gap: 2ch;
+  padding: 4px 0 2px;
+}
+
+.bar {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  white-space: pre;
+  overflow: hidden;
+  color: var(--dim);
+  padding: 4px 0;
+}
+
+.bar .done {
+  color: var(--green);
+  font-weight: 700;
+}
+
+.time {
+  white-space: nowrap;
+}
+
+/* ---------- dialogs ---------- */
+
+.menu {
+  list-style: none;
+  margin: 4px 0 12px;
+  padding: 0;
+}
+
+.menu li {
+  display: flex;
+  gap: 1ch;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.menu li[aria-selected="true"] {
+  background: rgba(111, 211, 224, 0.12);
+  color: var(--cyan);
+}
+
+.menu li .marker {
+  color: var(--cyan);
+  flex: none;
+}
+
+.menu .empty {
+  color: var(--dim);
+  cursor: default;
+}
+
+.add-server {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.add-server .primary {
+  justify-self: start;
+  margin-top: 6px;
+}
+
+input {
+  font: inherit;
+  color: var(--fg);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 8px 10px;
+  width: 100%;
+}
+
+.start-text {
+  color: var(--dim);
+}
+
+.pairing-code {
+  font-size: 2.2rem;
+  letter-spacing: 0.3ch;
+  color: var(--fg);
+  font-weight: 700;
+  text-align: center;
+  margin: 8px 0 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}

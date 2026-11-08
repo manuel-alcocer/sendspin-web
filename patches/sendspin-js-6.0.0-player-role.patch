@@ -1,0 +1,71 @@
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -50,6 +50,7 @@
+         // Create core (protocol + decoding). It resolves the effective initial
+         // delay, so read it back below for the scheduler's starting value.
+         this.core = new SendspinCore({
++            playerRole: config.playerRole,
+             url: config.url,
+             clientName: config.clientName,
+             productName: config.productName,
+--- a/dist/core/core.js
++++ b/dist/core/core.js
+@@ -116,6 +116,7 @@
+             onDelayCommand: config.onDelayCommand,
+             getExternalVolume: config.getExternalVolume,
+             applicationRoles: this.applicationRoles,
++            playerRole: config.playerRole,
+         });
+     }
+     // Route decrypted control messages from the transport. Pairing handles its
+--- a/dist/core/protocol-handler.js
++++ b/dist/core/protocol-handler.js
+@@ -24,6 +24,8 @@
+         this.activeRoles = null;
+         this.lastSentState = null;
+         this.clientName = config.clientName ?? "Sendspin Player";
++        // false: advertise only controller + metadata (a remote, no audio output)
++        this.playerRole = config.playerRole ?? true;
+         this.productName = config.productName;
+         this.manufacturer = config.manufacturer;
+         this.softwareVersion = config.softwareVersion;
+@@ -269,7 +271,7 @@
+             payload: {
+                 name: this.clientName,
+                 supported_roles: [
+-                    "player@v1",
++                    ...(this.playerRole ? ["player@v1"] : []),
+                     "controller@v1",
+                     "metadata@v1",
+                     ...(this.applicationRoles?.supportedRoles ?? []),
+@@ -281,10 +283,12 @@
+                     manufacturer: this.manufacturer,
+                     software_version: this.softwareVersion,
+                 },
+-                "player@v1_support": {
+-                    supported_formats: supportedFormats,
+-                    buffer_capacity: this.bufferCapacity ?? getDefaultBufferCapacity(supportedFormats),
+-                },
++                ...(this.playerRole ? {
++                    "player@v1_support": {
++                        supported_formats: supportedFormats,
++                        buffer_capacity: this.bufferCapacity ?? getDefaultBufferCapacity(supportedFormats),
++                    },
++                } : {}),
+                 ...this.applicationRoles?.helloSupport,
+             },
+         };
+--- a/dist/types.d.ts
++++ b/dist/types.d.ts
+@@ -566,6 +566,11 @@
+     url?: string;
+     /** Human-readable name for this player. Auto-generated if not provided. */
+     clientName?: string;
++    /**
++     * Advertise the player role (default true). With false the client joins as a
++     * remote only: controller + metadata, no audio output. (sendspin-web patch)
++     */
++    playerRole?: boolean;
+     /** Product name advertised in client/hello. Omitted when not set. */
+     productName?: string;
+     /** Manufacturer advertised in client/hello. Omitted when not set. */

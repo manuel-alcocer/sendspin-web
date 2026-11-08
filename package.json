@@ -1,0 +1,23 @@
+{
+  "name": "sendspin-web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Web (PWA) version of the Sendspin CLI: a Sendspin player and controller with a terminal-style UI",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "icons": "sh scripts/icons.sh",
+    "postinstall": "grep -q 'this.playerRole' node_modules/@sendspin/sendspin-js/dist/core/protocol-handler.js || patch -s -p1 -d node_modules/@sendspin/sendspin-js < patches/sendspin-js-6.0.0-player-role.patch"
+  },
+  "dependencies": {
+    "@sendspin/sendspin-js": "6.0.0"
+  },
+  "devDependencies": {
+    "typescript": "7.0.2",
+    "vite": "8.3.5",
+    "vite-plugin-pwa": "2.0.0"
+  }
+}

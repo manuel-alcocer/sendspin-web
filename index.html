@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b1a28" />
+    <meta name="description" content="Sendspin player and controller with a terminal-style UI" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>Sendspin</title>
+  </head>
+  <body>
+    <main id="app" class="screen" aria-live="polite">
+      <section id="player-view" class="grid" hidden>
+        <fieldset class="panel blue now-playing">
+          <legend>Now Playing</legend>
+          <dl class="kv">
+            <dt>Title:</dt>
+            <dd id="title" class="strong">—</dd>
+            <dt>Artist:</dt>
+            <dd id="artist" class="teal">—</dd>
+            <dt>Album:</dt>
+            <dd id="album" class="dim">—</dd>
+          </dl>
+          <p class="hints">
+            <button data-action="previous"><kbd>←</kbd> prev</button>
+            <button data-action="toggle-play"><kbd>&lt;space&gt;</kbd> <span id="play-label">play</span></button>
+            <button data-action="next"><kbd>→</kbd> next</button>
+            <button data-action="switch"><kbd>g</kbd> change group</button>
+          </p>
+        </fieldset>
+
+        <fieldset class="panel magenta volume">
+          <legend>Volume</legend>
+          <dl class="kv">
+            <dt>Group:</dt>
+            <dd id="group-volume" class="teal">—</dd>
+            <dt>Player:</dt>
+            <dd id="player-volume" class="teal">—</dd>
+          </dl>
+          <p class="hints">
+            <button data-action="player-up"><kbd>↑</kbd></button><span class="sep">/</span><button data-action="player-down"><kbd>↓</kbd></button>
+            <span class="label">player</span>
+            <button data-action="player-mute"><kbd>m</kbd> mute</button>
+          </p>
+          <p class="hints">
+            <button data-action="group-down"><kbd>[</kbd></button><span class="sep">/</span><button data-action="group-up"><kbd>]</kbd></button>
+            <span class="label">group</span>
+            <button data-action="group-mute"><kbd>M</kbd> mute</button>
+          </p>
+        </fieldset>
+
+        <fieldset class="panel green progress">
+          <legend>Progress</legend>
+          <div class="progress-row">
+            <button id="progress-bar" class="bar" data-action="seek" aria-label="Seek"></button>
+            <span id="progress-time" class="time teal">--:-- / --:--</span>
+          </div>
+        </fieldset>
+
+        <fieldset class="panel magenta playback">
+          <legend>Playback</legend>
+          <dl class="kv">
+            <dt>Repeat:</dt>
+            <dd id="repeat" class="teal">—</dd>
+            <dt>Shuffle:</dt>
+            <dd id="shuffle" class="teal">—</dd>
+          </dl>
+          <p class="hints bottom">
+            <button data-action="repeat"><kbd>r</kbd> repeat</button>
+            <button data-action="shuffle"><kbd>x</kbd> shuffle</button>
+          </p>
+        </fieldset>
+
+        <fieldset class="panel yellow stream">
+          <legend>Stream Quality</legend>
+          <dl class="kv">
+            <dt>Codec:</dt>
+            <dd id="codec" class="teal">—</dd>
+            <dt>Rate:</dt>
+            <dd id="rate" class="teal">—</dd>
+            <dt>Depth:</dt>
+            <dd id="depth" class="teal">—</dd>
+            <dt>Channels:</dt>
+            <dd id="channels" class="teal">—</dd>
+            <dt>Delay:</dt>
+            <dd id="delay" class="teal">—</dd>
+          </dl>
+          <p class="hints bottom">
+            <button data-action="delay-down"><kbd>,</kbd></button><span class="sep">/</span><button data-action="delay-up"><kbd>.</kbd></button>
+            <span class="label">adjust delay</span>
+          </p>
+        </fieldset>
+
+        <fieldset class="panel yellow server">
+          <legend>Server</legend>
+          <dl class="kv">
+            <dt>Status:</dt>
+            <dd id="status" class="strong">—</dd>
+            <dt>Host:</dt>
+            <dd id="host" class="teal ellipsis">—</dd>
+            <dt>Group:</dt>
+            <dd id="group-name" class="teal ellipsis">—</dd>
+            <dt>Audio:</dt>
+            <dd id="mode" class="teal">—</dd>
+          </dl>
+          <p class="hints bottom">
+            <button data-action="servers"><kbd>s</kbd> change server</button>
+            <button data-action="audio"><kbd>a</kbd> audio</button>
+          </p>
+        </fieldset>
+
+        <p class="footer">
+          <button data-action="quit"><kbd>q</kbd> quit</button>
+        </p>
+      </section>
+
+      <section id="servers-view" class="center" hidden>
+        <fieldset class="panel cyan dialog">
+          <legend>Select Server</legend>
+          <ul id="server-list" class="menu" role="listbox"></ul>
+          <form id="server-form" class="add-server">
+            <label for="server-url" class="dim">Add server (ws:// or wss:// URL)</label>
+            <input
+              id="server-url"
+              name="url"
+              type="url"
+              inputmode="url"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="wss://sendspin.example.org/sendspin"
+            />
+            <label for="client-name" class="dim">Player name</label>
+            <input id="client-name" name="name" type="text" autocomplete="off" maxlength="64" />
+            <button type="submit" class="primary"><kbd>⏎</kbd> add &amp; connect</button>
+          </form>
+          <p class="hints">
+            <span class="label"><kbd>↑</kbd>/<kbd>↓</kbd> select</span>
+            <span class="label"><kbd>⏎</kbd> connect</span>
+            <span class="label"><kbd>del</kbd> remove</span>
+            <button data-action="close-servers"><kbd>esc</kbd> back</button>
+          </p>
+        </fieldset>
+      </section>
+
+      <section id="start-view" class="center" hidden>
+        <fieldset class="panel blue dialog">
+          <legend>Sendspin</legend>
+          <p id="start-text" class="start-text">Tap or press any key to start</p>
+          <button id="start-button" class="primary" data-action="start"><kbd>⏎</kbd> start</button>
+        </fieldset>
+      </section>
+
+      <section id="pairing-view" class="center" hidden>
+        <fieldset class="panel cyan dialog">
+          <legend>Pairing Required</legend>
+          <p class="dim">Enter this code on the server:</p>
+          <p id="pairing-code" class="pairing-code">------</p>
+          <p class="hints">
+            <button data-action="cancel-pairing"><kbd>esc</kbd> cancel</button>
+          </p>
+        </fieldset>
+      </section>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
